@@ -16,9 +16,12 @@ export const manejarErrores: ErrorRequestHandler = (
   error, _req, res, _next,
 ) => {
   console.error(error);
-  const status = error instanceof AppError ? error.status : 500;
+  const jsonInvalido = error instanceof SyntaxError && "status" in error && error.status === 400;
+  const status = jsonInvalido ? 400 : error instanceof AppError ? error.status : 500;
   res.status(status).json({
-    mensaje: error instanceof Error
+    mensaje: jsonInvalido
+      ? "El cuerpo de la solicitud debe contener JSON válido."
+      : error instanceof Error
       ? error.message
       : "Error interno del servidor",
   });
