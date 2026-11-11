@@ -8,12 +8,13 @@ export function AppointmentCard({ cita, onConfirmar }: Props) {
     <article className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-lg font-bold text-slate-900">{cita.mascota}</h3>
             <StatusBadge estado={cita.estado} />
           </div>
           <p className="mt-2 text-sm text-slate-600">Cliente: {cita.cliente}</p>
-          <p className="text-sm text-slate-600">{cita.servicio} · {cita.hora}</p>
+          <p className="text-sm text-slate-600">{cita.servicio}</p>
+          <p className="mt-1 text-sm font-medium text-slate-700">{cita.fecha} · {cita.hora.slice(0, 5)}</p>
         </div>
 
         {cita.estado === 'solicitada' && (
