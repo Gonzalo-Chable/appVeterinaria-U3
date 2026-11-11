@@ -29,6 +29,9 @@ function esEstadoValido(valor: unknown): valor is EstadoCita {
 }
 
 function validarCampos(datos: Partial<NuevaCita>): void {
+  if (typeof datos !== "object" || datos === null || Array.isArray(datos)) {
+    throw new AppError(400, "Envía los datos de la cita en formato JSON.");
+  }
   const campos = [datos.mascota, datos.cliente, datos.servicio,
                   datos.fecha, datos.hora];
   const existeVacio = campos.some(
@@ -36,6 +39,18 @@ function validarCampos(datos: Partial<NuevaCita>): void {
   );
   if (existeVacio) {
     throw new AppError(400, "Todos los campos son obligatorios.");
+  }
+  if (datos.mascota!.length > 80 || datos.cliente!.length > 120 || datos.servicio!.length > 120) {
+    throw new AppError(400, "Mascota admite hasta 80 caracteres; cliente y servicio, hasta 120.");
+  }
+  const fecha = datos.fecha!;
+  const fechaConvertida = new Date(`${fecha}T00:00:00Z`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha) || Number(fecha.slice(0, 4)) < 1000 ||
+      Number.isNaN(fechaConvertida.getTime()) || fechaConvertida.toISOString().slice(0, 10) !== fecha) {
+    throw new AppError(400, "La fecha debe ser válida y tener formato AAAA-MM-DD.");
+  }
+  if (!/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(datos.hora!)) {
+    throw new AppError(400, "La hora debe ser válida y tener formato HH:MM.");
   }
   if (datos.estado !== undefined && !esEstadoValido(datos.estado)) {
     throw new AppError(400, "El estado de la cita no es válido.");
